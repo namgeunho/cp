@@ -63,13 +63,11 @@
   @keyframes eqbounce{0%,100%{height:12px;}50%{height:50px;}}
   .cover .ctitle{position:relative;color:var(--text);font-size:15px;font-weight:700;max-width:80%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cover .csub{position:relative;color:var(--muted);font-size:12px;font-weight:600;}
-  .stage-btns{position:absolute;top:12px;right:12px;z-index:3;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
-  .eye{width:96px;text-align:center;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
-    font-size:12px;font-weight:700;cursor:pointer;border-radius:20px;padding:9px 12px;
-    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+  .stagebtns{display:flex;flex-wrap:wrap;gap:8px;}
+  .eye{width:96px;text-align:center;background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
+    font-size:13px;font-weight:700;cursor:pointer;border-radius:14px;padding:12px 8px;}
   .eye:active{transform:scale(.96);} .eye.on{border-color:var(--coral);color:var(--coral-soft);}
-  .stage.empty .stage-btns{display:none;}
-  .stage:not(.video-visible) #mirror,.stage:not(.video-visible) #zoom,.stage:not(.video-visible) #ratio,.stage:not(.video-visible) #mute{display:none;}
+  .stagebtns:not(.video-on) #mirror,.stagebtns:not(.video-on) #zoom,.stagebtns:not(.video-on) #ratio,.stagebtns:not(.video-on) #mute{display:none;}
   .panlayer{position:absolute;inset:0;z-index:2;display:none;cursor:grab;touch-action:none;}
   .stage.video-visible.zoomed .panlayer{display:block;}
   .panlayer.grabbing{cursor:grabbing;}
@@ -229,16 +227,16 @@
       <div class="ctitle" id="coverTitle">소리만 재생 중</div>
       <div class="csub">화면은 꺼져 있고 소리만 나갑니다</div>
     </div>
-    <div class="stage-btns">
+  </div>
+
+  <div class="tab active" id="tab-player">
+    <div class="stagebtns" id="stagebtns">
       <button class="eye" id="eye">영상 보기</button>
       <button class="eye" id="mirror">거울모드</button>
       <button class="eye" id="zoom">확대</button>
       <button class="eye" id="ratio">16:9</button>
       <button class="eye" id="mute">음소거</button>
     </div>
-  </div>
-
-  <div class="tab active" id="tab-player">
     <div class="nowrow"><span class="nowtitle" id="nowtitle"></span><span class="speedTag" id="speedTag">1.0×</span></div>
     <div class="timeline-wrap">
       <div class="timeline" id="timeline">
@@ -416,11 +414,11 @@
   }
   function flash(msg){var n=$('nowtitle');n.textContent=msg;n.style.color='var(--coral-soft)';setTimeout(function(){n.style.color='';refreshTitle();},1600);}
 
-  function showVideo(){var st=$('stage');if(!st.classList.contains('video-visible')){st.classList.add('video-visible');$('eye').textContent='화면 끄기';}}
+  function showVideo(){var st=$('stage');if(!st.classList.contains('video-visible')){st.classList.add('video-visible');$('stagebtns').classList.add('video-on');$('eye').textContent='화면 끄기';}}
   function applyTransform(){var fr=$('player');if(!fr)return;var sx=(mirrorOn?-1:1)*zoom;fr.style.transformOrigin='center center';fr.style.transform='translate('+panX+'px,'+panY+'px) scale('+sx+','+zoom+')';}
   var zoomSteps=[1,1.5,2,3,4,6];
   function applyZoomUI(){$('zoom').textContent=zoom>1?('확대 '+zoom+'×'):'확대';$('zoom').classList.toggle('on',zoom>1);$('stage').classList.toggle('zoomed',zoom>1);}
-  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');$('eye').textContent=st.classList.contains('video-visible')?'화면 끄기':'영상 보기';});
+  $('eye').addEventListener('click',function(){var st=$('stage');var on=!st.classList.contains('video-visible');st.classList.toggle('video-visible',on);$('stagebtns').classList.toggle('video-on',on);$('eye').textContent=on?'화면 끄기':'영상 보기';});
   $('mirror').addEventListener('click',function(){mirrorOn=!mirrorOn;$('mirror').classList.toggle('on',mirrorOn);if(mirrorOn)showVideo();applyTransform();});
   $('zoom').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);zoom=zoomSteps[(i+1)%zoomSteps.length];if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
   var ratios=['16 / 9','9 / 16','1 / 1'],ratioLabels=['16:9','9:16','1:1'],ratioIdx=0;
