@@ -63,14 +63,14 @@
   @keyframes eqbounce{0%,100%{height:12px;}50%{height:50px;}}
   .cover .ctitle{position:relative;color:var(--text);font-size:15px;font-weight:700;max-width:80%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cover .csub{position:relative;color:var(--muted);font-size:12px;font-weight:600;}
-  .stage-btns{display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;align-items:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .stage-btns{display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;align-items:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:none;}
   .stage-btns::-webkit-scrollbar{display:none;}
   .eye{flex-shrink:0;text-align:center;white-space:nowrap;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
     font-size:12px;font-weight:700;cursor:pointer;border-radius:20px;padding:9px 12px;
     -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
   .eye:active{transform:scale(.96);} .eye.on{border-color:var(--coral);color:var(--coral-soft);}
-  .app:has(.stage.empty) .stage-btns{display:none;}
-  .app:has(.stage:not(.video-visible)) #mirror,.app:has(.stage:not(.video-visible)) #zoom,.app:has(.stage:not(.video-visible)) #zoomout,.app:has(.stage:not(.video-visible)) #ratio,.app:has(.stage:not(.video-visible)) #mute{display:none;}
+  .stage-btns.is-empty{display:none;}
+  .stage-btns:not(.is-video) #mirror,.stage-btns:not(.is-video) #zoom,.stage-btns:not(.is-video) #zoomout,.stage-btns:not(.is-video) #ratio,.stage-btns:not(.is-video) #mute{display:none;}
   .panlayer{position:absolute;inset:0;z-index:2;display:none;cursor:grab;touch-action:none;}
   .stage.video-visible.zoomed .panlayer{display:block;}
   .panlayer.grabbing{cursor:grabbing;}
@@ -764,6 +764,17 @@
     if(duration){var pct=t/duration*100;$('head').style.left=pct+'%';$('played').style.width=pct+'%';$('cur').textContent=fmt(t);}
     if(looping&&A!==null&&B!==null){if(t>=B||t<A-0.3){player.seekTo(A,true);}}
   },250);
+
+  (function(){
+    var st=document.getElementById('stage');
+    var btns=document.querySelector('.stage-btns');
+    function sync(){
+      btns.classList.toggle('is-empty',st.classList.contains('empty'));
+      btns.classList.toggle('is-video',st.classList.contains('video-visible'));
+    }
+    new MutationObserver(sync).observe(st,{attributes:true,attributeFilter:['class']});
+    sync();
+  })();
 
   load();showRoot();updateFootnote();
 })();
