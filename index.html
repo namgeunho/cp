@@ -63,14 +63,11 @@
   @keyframes eqbounce{0%,100%{height:12px;}50%{height:50px;}}
   .cover .ctitle{position:relative;color:var(--text);font-size:15px;font-weight:700;max-width:80%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cover .csub{position:relative;color:var(--muted);font-size:12px;font-weight:600;}
-  .stage-btns{display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;align-items:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:none;}
-  .stage-btns::-webkit-scrollbar{display:none;}
-  .eye{flex-shrink:0;text-align:center;white-space:nowrap;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
+  .stage-btns{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;align-items:flex-start;}
+  .eye{text-align:center;white-space:nowrap;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
     font-size:12px;font-weight:700;cursor:pointer;border-radius:20px;padding:9px 12px;
     -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
   .eye:active{transform:scale(.96);} .eye.on{border-color:var(--coral);color:var(--coral-soft);}
-  .stage-btns.is-empty{display:none;}
-  .stage-btns:not(.is-video) #mirror,.stage-btns:not(.is-video) #zoom,.stage-btns:not(.is-video) #zoomout,.stage-btns:not(.is-video) #ratio,.stage-btns:not(.is-video) #mute{display:none;}
   .panlayer{position:absolute;inset:0;z-index:2;display:none;cursor:grab;touch-action:none;}
   .stage.video-visible.zoomed .panlayer{display:block;}
   .panlayer.grabbing{cursor:grabbing;}
@@ -419,7 +416,7 @@
   }
   function flash(msg){var n=$('nowtitle');n.textContent=msg;n.style.color='var(--coral-soft)';setTimeout(function(){n.style.color='';refreshTitle();},1600);}
 
-  function syncBtns(){var st=$('stage'),b=document.querySelector('.stage-btns');if(!b)return;b.classList.toggle('is-empty',st.classList.contains('empty'));b.classList.toggle('is-video',st.classList.contains('video-visible'));}
+  function syncBtns(){var st=$('stage'),b=document.querySelector('.stage-btns');if(!b)return;var empty=st.classList.contains('empty'),vid=st.classList.contains('video-visible');b.style.display=empty?'none':'flex';['mirror','zoom','zoomout','ratio','mute'].forEach(function(id){var el=$(id);if(el)el.style.display=vid?'':'none';});}
   function showVideo(){var st=$('stage');if(!st.classList.contains('video-visible')){st.classList.add('video-visible');$('eye').textContent='화면 끄기';}syncBtns();}
   function applyTransform(){var fr=$('player');if(!fr)return;var sx=(mirrorOn?-1:1)*zoom;fr.style.transformOrigin='center center';fr.style.transform='translate('+panX+'px,'+panY+'px) scale('+sx+','+zoom+')';}
   var zoomSteps=[1,1.5,2,3,4,6];
