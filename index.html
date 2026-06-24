@@ -32,7 +32,7 @@
   .tab{display:none;} .tab.active{display:flex;flex-direction:column;gap:16px;}
 
   .urlbar{display:flex;gap:8px;}
-  .urlbar input{flex:1;background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
+  .urlbar input{flex:1;min-width:0;background:var(--bg-panel);border:1px solid var(--line);color:var(--text);
     border-radius:14px;padding:14px 16px;font-size:15px;outline:none;}
   .urlbar input::placeholder{color:var(--muted);}
   .urlbar input:focus{border-color:var(--coral);}
@@ -63,13 +63,13 @@
   @keyframes eqbounce{0%,100%{height:12px;}50%{height:50px;}}
   .cover .ctitle{position:relative;color:var(--text);font-size:15px;font-weight:700;max-width:80%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cover .csub{position:relative;color:var(--muted);font-size:12px;font-weight:600;}
-  .stage-btns{position:absolute;top:12px;right:12px;z-index:3;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
-  .eye{width:96px;text-align:center;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
+  .stage-btns{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;align-items:flex-start;}
+  .eye{text-align:center;white-space:nowrap;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
     font-size:12px;font-weight:700;cursor:pointer;border-radius:20px;padding:9px 12px;
     -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
   .eye:active{transform:scale(.96);} .eye.on{border-color:var(--coral);color:var(--coral-soft);}
-  .stage.empty .stage-btns{display:none;}
-  .stage:not(.video-visible) #mirror,.stage:not(.video-visible) #zoom,.stage:not(.video-visible) #ratio,.stage:not(.video-visible) #mute{display:none;}
+  .app:has(.stage.empty) .stage-btns{display:none;}
+  .app:has(.stage:not(.video-visible)) #mirror,.app:has(.stage:not(.video-visible)) #zoom,.app:has(.stage:not(.video-visible)) #zoomout,.app:has(.stage:not(.video-visible)) #ratio,.app:has(.stage:not(.video-visible)) #mute{display:none;}
   .panlayer{position:absolute;inset:0;z-index:2;display:none;cursor:grab;touch-action:none;}
   .stage.video-visible.zoomed .panlayer{display:block;}
   .panlayer.grabbing{cursor:grabbing;}
@@ -219,6 +219,15 @@
     </button>
   </div>
 
+  <div class="stage-btns">
+    <button class="eye" id="eye">영상 보기</button>
+    <button class="eye" id="mirror">거울모드</button>
+    <button class="eye" id="zoom">확대</button>
+    <button class="eye" id="zoomout">축소</button>
+    <button class="eye" id="ratio">16:9</button>
+    <button class="eye" id="mute">음소거</button>
+  </div>
+
   <div class="stage empty" id="stage">
     <div class="ph">플레이리스트 탭에서<br>곡을 선택하세요</div>
     <div id="player"></div>
@@ -228,13 +237,6 @@
       <div class="eq"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="ctitle" id="coverTitle">소리만 재생 중</div>
       <div class="csub">화면은 꺼져 있고 소리만 나갑니다</div>
-    </div>
-    <div class="stage-btns">
-      <button class="eye" id="eye">영상 보기</button>
-      <button class="eye" id="mirror">거울모드</button>
-      <button class="eye" id="zoom">확대</button>
-      <button class="eye" id="ratio">16:9</button>
-      <button class="eye" id="mute">음소거</button>
     </div>
   </div>
 
@@ -423,7 +425,8 @@
   $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');$('eye').textContent=st.classList.contains('video-visible')?'화면 끄기':'영상 보기';});
   $('mirror').addEventListener('click',function(){mirrorOn=!mirrorOn;$('mirror').classList.toggle('on',mirrorOn);if(mirrorOn)showVideo();applyTransform();});
   $('zoom').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);zoom=zoomSteps[(i+1)%zoomSteps.length];if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
-  var ratios=['16 / 9','9 / 16','1 / 1'],ratioLabels=['16:9','9:16','1:1'],ratioIdx=0;
+  $('zoomout').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);if(i>0){zoom=zoomSteps[i-1];}if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
+  var ratios=['16 / 9','9 / 16'],ratioLabels=['16:9','9:16'],ratioIdx=0;
   $('ratio').addEventListener('click',function(){ratioIdx=(ratioIdx+1)%ratios.length;$('stage').style.aspectRatio=ratios[ratioIdx];$('ratio').textContent=ratioLabels[ratioIdx];});
   $('mute').addEventListener('click',function(){if(!ready)return;if(player.isMuted()){player.unMute();$('mute').textContent='음소거';$('mute').classList.remove('on');}else{player.mute();$('mute').textContent='음소거 해제';$('mute').classList.add('on');}});
   // 확대 상태에서 영상 끌어 이동
