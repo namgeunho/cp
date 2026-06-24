@@ -120,11 +120,11 @@
   .seg-btns button:active{background:var(--bg-panel-2);}
   .seg-btns button.on{border-color:var(--coral);color:var(--coral-soft);}
   .player-group{background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:8px;}
-  .player-group .seg-btns button{background:transparent;border-color:transparent;}
-  .player-group .seg-btns button.on{background:var(--bg-panel-2);border-color:var(--coral);}
+  .player-group .seg-btns button{background:transparent;border-color:var(--line);}
+  .player-group .seg-btns button.on{background:var(--bg-panel-2);border-color:var(--coral);border-width:2px;}
   .player-group .song{background:var(--bg-panel-2);}
   .panellist{display:flex;flex-direction:column;gap:8px;}
-  .song.playing-now{border-color:var(--coral);box-shadow:0 0 0 1px var(--coral) inset;}
+  .song.playing-now{border-color:var(--coral);}
   .song.playing-now .smeta b{color:var(--coral-soft);}
   .seg{display:flex;align-items:center;gap:10px;background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
   .seg .sopen{flex:1;min-width:0;cursor:pointer;}
@@ -615,7 +615,8 @@
   function showRoot(){currentFolder=null;$('rootView').style.display='block';$('folderView').style.display='none';renderRoot();}
   function openFolder(id){currentFolder=id;$('rootView').style.display='none';$('folderView').style.display='block';renderFolder();}
   $('backFolder').addEventListener('click',showRoot);
-  function rerender(){save();if(currentFolder===null)renderRoot();else renderFolder();}
+  function syncQueue(){playQueue = curFromId===null ? root.filter(function(it){return it.kind==='song';}) : ((folderById(curFromId)||{children:[]}).children).slice();if(curId){playIndex=-1;for(var k=0;k<playQueue.length;k++){if(playQueue[k].vid===curId){playIndex=k;break;}}}}
+  function rerender(){save();if(currentFolder===null)renderRoot();else renderFolder();syncQueue();if(panelMode==='list')renderQueue();}
 
   // ---- render root (folders + songs mixed) ----
   function renderRoot(){
