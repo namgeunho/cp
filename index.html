@@ -230,14 +230,14 @@
     </div>
     <div class="stage-btns-overlay">
       <button class="eye" id="eye">영상 보기</button>
-      <button class="eye" id="mirror">거울모드</button>
     </div>
   </div>
 
   <div class="stage-btns-bottom">
+    <button class="eye" id="mirror">거울모드</button>
+    <button class="eye" id="ratio">16:9</button>
     <button class="eye" id="zoom">확대</button>
     <button class="eye" id="zoomout">축소</button>
-    <button class="eye" id="ratio">16:9</button>
     <button class="eye" id="mute">음소거</button>
   </div>
 
@@ -419,17 +419,18 @@
   }
   function flash(msg){var n=$('nowtitle');n.textContent=msg;n.style.color='var(--coral-soft)';setTimeout(function(){n.style.color='';refreshTitle();},1600);}
 
-  function syncBtns(){var st=$('stage');var empty=st.classList.contains('empty'),vid=st.classList.contains('video-visible');var ov=document.querySelector('.stage-btns-overlay'),bt=document.querySelector('.stage-btns-bottom');if(ov)ov.style.display=empty?'none':'flex';if(bt)bt.style.display=(empty||!vid)?'none':'flex';var mir=$('mirror');if(mir)mir.style.display=vid?'':'none';}
+  function syncBtns(){var st=$('stage');var empty=st.classList.contains('empty'),vid=st.classList.contains('video-visible');var ov=document.querySelector('.stage-btns-overlay'),bt=document.querySelector('.stage-btns-bottom');if(ov)ov.style.display=empty?'none':'flex';if(bt)bt.style.display=(empty||!vid)?'none':'flex';}
   function showVideo(){var st=$('stage');if(!st.classList.contains('video-visible')){st.classList.add('video-visible');$('eye').textContent='화면 끄기';}syncBtns();}
   function applyTransform(){var fr=$('player');if(!fr)return;var sx=(mirrorOn?-1:1)*zoom;fr.style.transformOrigin='center center';fr.style.transform='translate('+panX+'px,'+panY+'px) scale('+sx+','+zoom+')';}
   var zoomSteps=[1,1.5,2,3,4,6];
   function applyZoomUI(){$('zoom').textContent=zoom>1?('확대 '+zoom+'×'):'확대';$('zoom').classList.toggle('on',zoom>1);$('stage').classList.toggle('zoomed',zoom>1);}
-  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');$('eye').textContent=st.classList.contains('video-visible')?'화면 끄기':'영상 보기';syncBtns();});
+  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');var on=st.classList.contains('video-visible');$('eye').textContent=on?'화면 끄기':'영상 보기';if(on){ratioIdx=savedRatioIdx;}else{savedRatioIdx=ratioIdx;ratioIdx=0;}applyRatio();syncBtns();});
   $('mirror').addEventListener('click',function(){mirrorOn=!mirrorOn;$('mirror').classList.toggle('on',mirrorOn);if(mirrorOn)showVideo();applyTransform();});
   $('zoom').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);zoom=zoomSteps[(i+1)%zoomSteps.length];if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
   $('zoomout').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);if(i>0){zoom=zoomSteps[i-1];}if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
-  var ratios=['16 / 9','9 / 16'],ratioLabels=['16:9','9:16'],ratioIdx=0;
-  $('ratio').addEventListener('click',function(){ratioIdx=(ratioIdx+1)%ratios.length;$('stage').style.aspectRatio=ratios[ratioIdx];$('ratio').textContent=ratioLabels[ratioIdx];});
+  var ratios=['16 / 9','9 / 16'],ratioLabels=['16:9','9:16'],ratioIdx=0,savedRatioIdx=0;
+  function applyRatio(){$('stage').style.aspectRatio=ratios[ratioIdx];$('ratio').textContent=ratioLabels[ratioIdx];}
+  $('ratio').addEventListener('click',function(){ratioIdx=(ratioIdx+1)%ratios.length;applyRatio();});
   $('mute').addEventListener('click',function(){if(!ready)return;if(player.isMuted()){player.unMute();$('mute').textContent='음소거';$('mute').classList.remove('on');}else{player.mute();$('mute').textContent='음소거 해제';$('mute').classList.add('on');}});
   // 확대 상태에서 영상 끌어 이동
   (function(){
