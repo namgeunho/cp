@@ -63,8 +63,9 @@
   @keyframes eqbounce{0%,100%{height:12px;}50%{height:50px;}}
   .cover .ctitle{position:relative;color:var(--text);font-size:15px;font-weight:700;max-width:80%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .cover .csub{position:relative;color:var(--muted);font-size:12px;font-weight:600;}
-  .stage-btns{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;align-items:flex-start;}
-  .eye{text-align:center;white-space:nowrap;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
+  .stage-btns{display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;align-items:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .stage-btns::-webkit-scrollbar{display:none;}
+  .eye{flex-shrink:0;text-align:center;white-space:nowrap;background:rgba(23,19,31,.65);border:1px solid var(--line);color:var(--text);
     font-size:12px;font-weight:700;cursor:pointer;border-radius:20px;padding:9px 12px;
     -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
   .eye:active{transform:scale(.96);} .eye.on{border-color:var(--coral);color:var(--coral-soft);}
