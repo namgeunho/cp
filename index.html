@@ -42,7 +42,7 @@
     border-radius:14px;padding:14px 16px;font-size:16px;outline:none;}
   .urlbar input::placeholder{color:var(--muted);}
   .urlbar input:focus{border-color:var(--coral);}
-  .urlbar button{background:var(--coral);color:#241018;border:none;border-radius:14px;
+  .urlbar button{background:var(--coral);color:#fff;border:none;border-radius:14px;
     padding:0 18px;font-size:15px;font-weight:800;cursor:pointer;white-space:nowrap;}
   .urlbar button:active{transform:scale(.97);}
 
@@ -293,7 +293,6 @@
       <button class="loop" id="loop">구간반복<small id="loopState">꺼짐</small></button>
       <button class="setB" id="setB">B 지점<small id="bTime">—</small></button>
     </div>
-    <div class="section-label">재생 속도</div>
     <div class="speed">
       <button data-s="0.25">0.25×</button><button data-s="0.5">0.5×</button>
       <button data-s="0.75">0.75×</button><button data-s="1" class="on">1.0×</button>
@@ -692,7 +691,7 @@
     else{ic='<div class="ficon">'+folderSvg+'</div>';}
     row.innerHTML='<span class="drag" title="끌어서 순서 변경">≡</span>'+
       '<div class="fopen">'+ic+'<div class="fmeta"><b>'+escapeHtml(f.name)+'</b><small>'+f.children.length+'곡</small></div></div>'+
-      '<button class="fact share" title="공유">'+shareSvg+'</button><button class="fact ren" title="편집">'+penSvg+'</button><button class="fact del" title="삭제">×</button><span class="chev">›</span>';
+      '<button class="fact share" title="공유">'+shareSvg+'</button><button class="fact ren" title="편집">'+penSvg+'</button><button class="fact del" title="삭제">×</button>';
     row.querySelector('.fopen').addEventListener('click',function(){openFolder(f.id);});
     row.querySelector('.share').addEventListener('click',function(e){e.stopPropagation();shareFolder(f);});
     row.querySelector('.ren').addEventListener('click',function(e){e.stopPropagation();openFolderModal('edit',f.id,f.name);});
