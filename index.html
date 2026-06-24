@@ -128,6 +128,15 @@
   .seg-btns button.on{border-color:var(--coral);color:var(--coral-soft);}
   .player-group{background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:8px;}
   #installBar{display:none;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;background:var(--bg-panel-2);border:1px solid var(--coral);border-radius:14px;padding:11px 12px;align-items:center;gap:10px;font-size:13px;box-shadow:0 10px 34px rgba(0,0,0,.55);}
+  #blackout{display:none;position:fixed;inset:0;z-index:80;background:#000;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+  #blackout.on{display:flex;}
+  #blackout .bo-eq{display:flex;align-items:flex-end;gap:7px;height:60px;}
+  #blackout .bo-eq i{width:8px;border-radius:4px;height:14px;background:#333;animation:eqbounce .9s ease-in-out infinite;}
+  #blackout .bo-eq i:nth-child(1){animation-delay:0s;} #blackout .bo-eq i:nth-child(2){animation-delay:.22s;}
+  #blackout .bo-eq i:nth-child(3){animation-delay:.08s;} #blackout .bo-eq i:nth-child(4){animation-delay:.4s;} #blackout .bo-eq i:nth-child(5){animation-delay:.16s;}
+  #blackout .bo-title{color:#363636;font-size:22px;font-weight:800;text-align:center;line-height:1.4;}
+  #blackout .bo-artist{color:#2e2e2e;font-size:15px;font-weight:600;text-align:center;margin-top:-8px;}
+  #blackout #boClose{margin-top:14px;background:transparent;border:none;color:#363636;font-size:30px;font-weight:400;line-height:1;cursor:pointer;padding:12px 20px;}
   #installBar.show{display:flex;}
   #installBar .ib-text{flex:1;line-height:1.4;color:var(--text);}
   #installBar button{border:none;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer;flex-shrink:0;}
@@ -228,6 +237,12 @@
 </style>
 </head>
 <body>
+<div id="blackout">
+  <div class="bo-eq"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="bo-title" id="boTitle"></div>
+  <div class="bo-artist" id="boArtist"></div>
+  <button id="boClose">✕</button>
+</div>
 <div id="installBar">
   <div class="ib-text" id="ibText"></div>
   <button class="ib-go" id="ibGo">설치</button>
@@ -261,6 +276,7 @@
     </div>
     <div class="stage-btns-overlay">
       <button class="eye" id="eye">영상 보기</button>
+      <button class="eye" id="blackoutBtn">화면 끄기</button>
     </div>
   </div>
 
@@ -490,7 +506,9 @@
   function applyTransform(){var fr=$('player');if(!fr)return;var sx=(mirrorOn?-1:1)*zoom;fr.style.transformOrigin='center center';fr.style.transform='translate('+panX+'px,'+panY+'px) scale('+sx+','+zoom+')';}
   var zoomSteps=[1,1.5,2,3,4,6];
   function applyZoomUI(){$('zoom').textContent=zoom>1?('확대 '+zoom+'×'):'확대';$('zoom').classList.toggle('on',zoom>1);$('stage').classList.toggle('zoomed',zoom>1);}
-  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');var on=st.classList.contains('video-visible');$('eye').textContent=on?'화면 끄기':'영상 보기';if(on){ratioIdx=savedRatioIdx;applyRatio();}else{savedRatioIdx=ratioIdx;ratioIdx=0;st.style.aspectRatio='';}syncBtns();});
+  $('blackoutBtn').addEventListener('click',function(){var s=(playIndex>=0&&playQueue[playIndex])?playQueue[playIndex]:null;$('boTitle').textContent=s?(s.song||'제목 없음'):(curLabel||'재생 중');$('boArtist').textContent=s?(s.artist||''):'';$('blackout').classList.add('on');});
+  $('boClose').addEventListener('click',function(){$('blackout').classList.remove('on');});
+  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');var on=st.classList.contains('video-visible');$('eye').textContent=on?'영상 끄기':'영상 보기';if(on){ratioIdx=savedRatioIdx;applyRatio();}else{savedRatioIdx=ratioIdx;ratioIdx=0;st.style.aspectRatio='';}syncBtns();});
   $('mirror').addEventListener('click',function(){mirrorOn=!mirrorOn;$('mirror').classList.toggle('on',mirrorOn);if(mirrorOn)showVideo();applyTransform();});
   $('zoom').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);zoom=zoomSteps[(i+1)%zoomSteps.length];if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
   $('zoomout').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);if(i>0){zoom=zoomSteps[i-1];}if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
