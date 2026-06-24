@@ -119,6 +119,10 @@
   .seg-btns button{background:var(--bg-panel);border:1px solid var(--line);color:var(--text);border-radius:16px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;}
   .seg-btns button:active{background:var(--bg-panel-2);}
   .seg-btns button.on{border-color:var(--coral);color:var(--coral-soft);}
+  .player-group{background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:8px;}
+  .player-group .seg-btns button{background:transparent;border-color:transparent;}
+  .player-group .seg-btns button.on{background:var(--bg-panel-2);border-color:var(--coral);}
+  .player-group .song{background:var(--bg-panel-2);}
   .panellist{display:flex;flex-direction:column;gap:8px;}
   .song.playing-now{border-color:var(--coral);box-shadow:0 0 0 1px var(--coral) inset;}
   .song.playing-now .smeta b{color:var(--coral-soft);}
@@ -268,11 +272,13 @@
       <button data-s="0.25">0.25×</button><button data-s="0.5">0.5×</button>
       <button data-s="0.75">0.75×</button><button data-s="1" class="on">1.0×</button>
     </div>
-    <div class="seg-btns">
-      <button id="saveSeg">구간 저장</button>
-      <button id="showList">재생목록</button>
+    <div class="player-group">
+      <div class="seg-btns">
+        <button id="saveSeg">구간 저장</button>
+        <button id="showList">재생목록</button>
+      </div>
+      <div class="panellist" id="panelList" style="display:none"></div>
     </div>
-    <div class="panellist" id="panelList" style="display:none"></div>
   </div>
 
   <div class="tab" id="tab-playlist">
