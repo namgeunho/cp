@@ -488,7 +488,18 @@
   document.querySelectorAll('.speed button').forEach(function(b){b.addEventListener('click',function(){speed=parseFloat(b.dataset.s);if(ready)player.setPlaybackRate(speed);document.querySelectorAll('.speed button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');$('speedTag').textContent=speed.toFixed(2).replace(/0$/,'')+'×';});});
 
   var tl=$('timeline');
-  tl.addEventListener('click',function(e){if(e.target&&e.target.closest&&e.target.closest('.marker'))return;if(!ready||!duration)return;var rect=tl.getBoundingClientRect();var x=((e.touches?e.touches[0].clientX:e.clientX)-rect.left)/rect.width;x=Math.min(1,Math.max(0,x));player.seekTo(x2t(x),true);});
+  var scrubbing=false;
+  tl.addEventListener('pointerdown',function(e){
+    if(e.target&&e.target.closest&&e.target.closest('.marker'))return;
+    if(!ready||!duration)return;
+    e.preventDefault();scrubbing=true;
+    var rect=tl.getBoundingClientRect();
+    function moveTo(cx){var x=(cx-rect.left)/rect.width;x=Math.min(1,Math.max(0,x));var t=x2t(x);var pct=t2pct(t);$('head').style.left=pct+'%';$('played').style.width=pct+'%';$('cur').textContent=fmt(t);player.seekTo(t,true);}
+    moveTo(e.clientX);
+    function mv(ev){moveTo(ev.clientX);}
+    function up(){scrubbing=false;document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);}
+    document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);
+  });
   function bindMarker(markEl,which){
     markEl.addEventListener('pointerdown',function(e){
       e.preventDefault();e.stopPropagation();if(!duration)return;
@@ -784,7 +795,7 @@
     if(!ready||!player||typeof player.getCurrentTime!=='function')return;
     var t=player.getCurrentTime()||0;
     if(!duration){duration=player.getDuration()||0;if(duration)$('dur').textContent=fmt(duration);}
-    if(duration){var pct=t2pct(t);$('head').style.left=pct+'%';$('played').style.width=pct+'%';$('cur').textContent=fmt(t);}
+    if(duration&&!scrubbing){var pct=t2pct(t);$('head').style.left=pct+'%';$('played').style.width=pct+'%';$('cur').textContent=fmt(t);}
     if(looping&&A!==null&&B!==null){if(t>=B||t<A-0.3){player.seekTo(A,true);}}
   },250);
 
