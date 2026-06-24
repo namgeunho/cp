@@ -48,6 +48,7 @@
 
   .stage{position:relative;border-radius:22px;overflow:hidden;background:var(--bg-panel);
     border:1px solid var(--line);width:100%;max-width:484px;aspect-ratio:16 / 9;flex-shrink:0;align-self:center;display:flex;align-items:center;justify-content:center;}
+  .stage:not(.video-visible){aspect-ratio:16 / 5;}
   .stage.empty .ph{display:block;}
   .stage .ph{display:none;color:var(--muted);font-size:14px;text-align:center;padding:24px;line-height:1.6;}
   #player{position:absolute;inset:0;width:100%;height:100%;}
@@ -139,6 +140,7 @@
   .song.playing-now{border-color:var(--coral);}
   .song.playing-now .smeta b{color:var(--coral-soft);}
   .seg{display:flex;align-items:center;gap:10px;background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  .seg.on{border-color:var(--coral);}
   .seg .sopen{flex:1;min-width:0;cursor:pointer;}
   .seg .sopen .ln{display:flex;align-items:baseline;gap:8px;min-width:0;}
   .seg .sopen b{font-size:16px;font-weight:800;flex-shrink:0;}
@@ -474,7 +476,7 @@
   function refreshTitle(){if(curLabel){$('nowtitle').textContent=curLabel;$('coverTitle').textContent=curLabel;return;}try{var d=player.getVideoData();if(d&&d.title){$('nowtitle').textContent=d.title;$('coverTitle').textContent=d.title;}}catch(e){}}
   function playVid(vid,label){
     if(!vid)return;
-    curId=vid;curLabel=label||'';A=null;B=null;looping=false;updateAB();updateLoopBtn();saveLast();
+    curId=vid;curLabel=label||'';A=null;B=null;looping=false;activeSegIdx=-1;updateAB();updateLoopBtn();saveLast();
     $('stage').classList.remove('empty');syncBtns();
     $('coverBg').style.backgroundImage='url(https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg)';
     $('coverTitle').textContent=label||'불러오는 중…';$('nowtitle').textContent=label||'';
@@ -488,7 +490,7 @@
   function applyTransform(){var fr=$('player');if(!fr)return;var sx=(mirrorOn?-1:1)*zoom;fr.style.transformOrigin='center center';fr.style.transform='translate('+panX+'px,'+panY+'px) scale('+sx+','+zoom+')';}
   var zoomSteps=[1,1.5,2,3,4,6];
   function applyZoomUI(){$('zoom').textContent=zoom>1?('확대 '+zoom+'×'):'확대';$('zoom').classList.toggle('on',zoom>1);$('stage').classList.toggle('zoomed',zoom>1);}
-  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');var on=st.classList.contains('video-visible');$('eye').textContent=on?'화면 끄기':'영상 보기';if(on){ratioIdx=savedRatioIdx;}else{savedRatioIdx=ratioIdx;ratioIdx=0;}applyRatio();syncBtns();});
+  $('eye').addEventListener('click',function(){var st=$('stage');st.classList.toggle('video-visible');var on=st.classList.contains('video-visible');$('eye').textContent=on?'화면 끄기':'영상 보기';if(on){ratioIdx=savedRatioIdx;applyRatio();}else{savedRatioIdx=ratioIdx;ratioIdx=0;st.style.aspectRatio='';}syncBtns();});
   $('mirror').addEventListener('click',function(){mirrorOn=!mirrorOn;$('mirror').classList.toggle('on',mirrorOn);if(mirrorOn)showVideo();applyTransform();});
   $('zoom').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);zoom=zoomSteps[(i+1)%zoomSteps.length];if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
   $('zoomout').addEventListener('click',function(){var i=zoomSteps.indexOf(zoom);if(i>0){zoom=zoomSteps[i-1];}if(zoom===1){panX=0;panY=0;}applyZoomUI();if(zoom>1)showVideo();applyTransform();});
@@ -574,7 +576,7 @@
 
   // ---- panel: segments / playlist queue ----
   var segments={};        // vid -> [{start,end,memo}]
-  var segCtx=null;
+  var segCtx=null,activeSegIdx=-1;
   var panelMode=null;     // 'seg' | 'list' | null
   var playQueue=[],playIndex=-1,curFromId=null;
 
@@ -589,12 +591,12 @@
     if(!segs||!segs.length){el.innerHTML='<div class="empty-note">저장된 구간이 없습니다.<br>A·B 지점을 정하고 구간 저장을 누르세요</div>';return;}
     el.innerHTML='';
     segs.forEach(function(sg,i){
-      var row=document.createElement('div');row.className='seg';
+      var row=document.createElement('div');row.className='seg';if(i===activeSegIdx)row.classList.add('on');
       row.innerHTML='<div class="sopen"><div class="ln"><b>'+segLabel(i)+'</b><span class="rng">'+fmt(sg.start)+' ~ '+fmt(sg.end)+'</span>'+(sg.memo?'<span class="memo">'+escapeHtml(sg.memo)+'</span>':'')+'</div></div>'+
         '<button class="sact ren" title="메모 수정">'+penSvg+'</button><button class="sact del" title="삭제">×</button>';
-      row.querySelector('.sopen').addEventListener('click',function(){playSeg(sg);});
+      row.querySelector('.sopen').addEventListener('click',function(){activeSegIdx=i;playSeg(sg);renderSegs();});
       row.querySelector('.ren').addEventListener('click',function(){openSegModal(i);});
-      row.querySelector('.del').addEventListener('click',function(){segs.splice(i,1);save();renderSegs();});
+      row.querySelector('.del').addEventListener('click',function(){segs.splice(i,1);activeSegIdx=-1;save();renderSegs();});
       el.appendChild(row);
     });
   }
